@@ -107,12 +107,12 @@ class ORTModel(OptimizedModel):
     def device(self, value):
         self._device = value
 
-    def to(self, device):
+    def to(self, device, use_tensorrt):
         """
         Changes the ONNX Runtime provider according to the device.
         """
         self.device = device
-        provider = get_provider_for_device(self.device)
+        provider = get_provider_for_device(self.device, use_tensorrt=use_tensorrt)
         self.model.set_providers([provider])
         return self
 

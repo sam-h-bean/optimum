@@ -23,7 +23,6 @@ import onnxruntime as ort
 
 from ..onnx import OnnxConfigWithLoss, OnnxConfigWithPastAndLoss, OnnxSeq2SeqConfigWithPastAndLoss
 
-
 logger = logging.get_logger(__name__)
 
 ONNX_WEIGHTS_NAME = "model.onnx"
@@ -157,8 +156,14 @@ def get_device_for_provider(provider: str) -> torch.device:
     return torch.device("cuda") if provider == "CUDAExecutionProvider" else torch.device("cpu")
 
 
-def get_provider_for_device(device: torch.device) -> str:
+def get_provider_for_device(device: torch.device, use_tensorrt: bool = False) -> str:
     """
     Gets the ONNX Runtime provider associated with the PyTorch device (CPU/CUDA).
     """
-    return "CUDAExecutionProvider" if device.type.lower() == "cuda" else "CPUExecutionProvider"
+    if device.type.lower() == "cuda":
+        if use_tensorrt:
+            return "TensorrtExecutionProvider"
+        else:
+            return "CUDAExecutionProvider"
+    else:
+        return "CPUExecutionProvider"
